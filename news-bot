@@ -1,0 +1,31 @@
+#!/bin/bash
+
+# Get the directory where the script is located
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+# Change to the project root directory
+cd "$SCRIPT_DIR"
+
+# Parse arguments
+MODULE=""
+ARGS=()
+
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --module)
+            MODULE="$2"
+            shift 2
+            ;;
+        *)
+            ARGS+=("$1")
+            shift
+            ;;
+    esac
+done
+
+# If a module is specified, run that instead of main
+if [ -n "$MODULE" ]; then
+    poetry run python -m "news_bot.$MODULE" "${ARGS[@]}"
+else
+    poetry run python -m news_bot.main "${ARGS[@]}"
+fi 

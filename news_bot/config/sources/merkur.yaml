@@ -1,0 +1,14 @@
+source_url: "https://www.merkur.de/lokales/fuerstenfeldbruck/"
+skip_patterns:
+  - "/impressum"
+  - "/datenschutz"
+  - "/agb"
+  - "/login"
+  - "/abo"
+  - "/archiv"
+article_sections:
+  - "/lokales/fuerstenfeldbruck"
+  - "/lokales/fuerstenfeldbruck"
+path_validation:
+  min_parts: 2
+  must_end_with: ".html"

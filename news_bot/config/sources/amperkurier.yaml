@@ -1,0 +1,21 @@
+source_url: "https://www.amperkurier.de/"
+skip_patterns:
+  - "/impressum"
+  - "/datenschutz"
+  - "/agb"
+  - "/login"
+  - "/abo"
+  - "/archiv"
+article_sections:
+  - "/landkreis"
+  - "/freising"
+  - "/moosburg"
+  - "/wartenberg"
+  - "/zolling"
+  - "/de/region"
+  - "/de/polizei"
+  - "/de/vereine"
+#  - "/de/veranstaltungen"
+path_validation:
+  min_parts: 4
+  #must_end_with: ".html"
