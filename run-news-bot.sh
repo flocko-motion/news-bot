@@ -14,10 +14,11 @@ if [ ! -f "$API_KEY_FILE" ]; then
     exit 1
 fi
 
-# Default to GCR image, fallback to local build
-IMAGE_NAME="gcr.io/${GCP_PROJECT_ID:-your-project-id}/news-bot:latest"
+# Default to GHCR image, fallback to local build
+REPO_OWNER=$(git config --get remote.origin.url | sed 's/.*github.com[:/]\([^/]*\)\/.*/\1/')
+IMAGE_NAME="ghcr.io/${REPO_OWNER}/news-bot:latest"
 if ! docker pull "$IMAGE_NAME" 2>/dev/null; then
-    echo "GCR image not found, building locally..."
+    echo "GHCR image not found, building locally..."
     docker build -t news-bot .
     IMAGE_NAME="news-bot"
 fi
