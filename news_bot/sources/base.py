@@ -1,18 +1,20 @@
+from datetime import datetime
 from typing import List, Dict, Any
 from urllib.parse import urlparse
 import yaml
-import os
-from ..fetcher import NewsFetcher
-from ..fetcher.content import ContentFetcher
 
-class BaseNewsFetcher(NewsFetcher):
-    def __init__(self, config_path: str):
-        """Initialize the fetcher with a YAML config file."""
+from sources.article import Article
+from sources.fetcher import extract_urls
+
+
+class BaseNewsFetcher():
+    def __init__(self, source: str, config_path: str):
+        self.source = source
+
         with open(config_path, 'r', encoding='utf-8') as f:
             self.config = yaml.safe_load(f)
             
-        super().__init__(self.config['source_url'])
-        self.content_fetcher = ContentFetcher()
+        self.source_url = self.config['source_url']
         self.skip_patterns = self.config['skip_patterns']
         self.article_sections = self.config['article_sections']
 
@@ -64,6 +66,16 @@ class BaseNewsFetcher(NewsFetcher):
                 
         return True
 
-    def fetch_articles(self) -> List[str]:
-        """Fetch article URLs from the source."""
-        return self.content_fetcher.extract_urls(self.source_url, self._is_article_url) 
+    def fetch_articles(self) -> List[Article]:
+        print(f"\nFetching URLs from {self.source}...")
+        urls =  extract_urls(self.source_url, self._is_article_url)
+        articles = [
+            Article(
+                date=datetime.now(),  # Will be parsed from article later
+                source_name=self.source,
+                source_url=url
+            )
+            for url in urls
+        ]
+        print(f"✓ Found {len(articles)} articles")
+        return articles

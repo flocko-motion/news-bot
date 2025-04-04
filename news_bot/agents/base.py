@@ -1,14 +1,39 @@
+from pathlib import Path
 from typing import Dict, Any, Optional
 from openai import OpenAI
-import json
 import time
-from .api_key import load_api_key
 
 class Assistant:
+    _api_key = None
+
     def __init__(self, name: str, instructions: str, model: str = "gpt-4o-mini"):
-        self.client = OpenAI(api_key=load_api_key())
+        self.client = OpenAI(api_key=self.api_key())
         self.assistant = self._create_assistant(name, instructions, model)
-        
+
+    @classmethod
+    def api_key(cls) -> str:
+        if cls._api_key:
+            return cls._api_key
+
+        """Load OpenAI API key from ~/.news-bot/openai-api.key"""
+        home = Path.home()
+        key_path = home / '.news-bot' / 'openai-api.key'
+
+        if not key_path.exists():
+            print(f"API key not found at {key_path}")
+            exit(1)
+
+        with open(key_path) as f:
+            api_key = f.read().strip()
+
+        if not api_key:
+            print(f"API key file is empty at {key_path}")
+            exit(1)
+
+        cls._api_key = api_key.strip()
+
+        return cls._api_key
+
     def _create_assistant(self, name: str, instructions: str, model: str):
         """Create an OpenAI Assistant with specific tools and instructions."""
         return self.client.beta.assistants.create(
@@ -50,8 +75,7 @@ class Assistant:
                 
             time.sleep(1)
             
-    def _get_assistant_response(self, thread_id: str) -> Dict[str, Any]:
-        """Get the latest message from the assistant."""
+    def _get_assistant_response(self, thread_id: str) -> str:
         messages = self.client.beta.threads.messages.list(
             thread_id=thread_id
         )

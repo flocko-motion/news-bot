@@ -1,10 +1,11 @@
 from typing import Dict, Any, List
+
+from sources.article import Article
 from .base import Assistant
 
 class DigestAssistant(Assistant):
-    def __init__(self, api_key: str):
+    def __init__(self):
         super().__init__(
-            api_key=api_key,
             name="News Digest",
             instructions="""Du erstellst einen sehr kurzen Überblick über die wichtigsten Nachrichten. Der User gibt dir eine Liste von Artikeln mit ihren Zusammenfassungen.
             
@@ -27,40 +28,27 @@ class DigestAssistant(Assistant):
             Quellen: [URLs]"""
         )
         
-    def create_digest(self, articles: List[Dict[str, Any]]) -> str:
-        """Create a digest from multiple articles."""
-        # Filter out articles with errors
-        valid_articles = [article for article in articles if not article.get('error')]
-        
-        if not valid_articles:
-            return "Keine gültigen Artikel gefunden."
-            
-        # Create a new thread for this conversation
-        thread = self.client.beta.threads.create()
-        
-        # Format articles for the assistant
+    def create_digest(self, articles: List[Article]) -> str:
+        print (f"Creating digest for {len(articles)} articles")
         articles_text = "\n\n".join([
-            f"Titel: {article['titel']}\nInhalt: {article['inhalt']}\nQuelle: {article['quelle']}"
-            for article in valid_articles
+            f"Quelle: {article.source_name}\nURL: {article.source_url}\nTitel: {article.title}\nInhalt: {article.summary}"
+            for article in articles
         ])
         
-        # Add the user's request to analyze the articles
+        thread = self.client.beta.threads.create()
         self.client.beta.threads.messages.create(
             thread_id=thread.id,
             role="user",
-            content=f"Erstelle einen sehr kurzen Überblick über diese Artikel:\n\n{articles_text}"
+            content=articles_text
         )
         
-        # Create a run
         run = self.client.beta.threads.runs.create(
             thread_id=thread.id,
             assistant_id=self.assistant.id
         )
         
-        # Wait for the run to complete
         run_result = self._wait_for_run(thread.id, run.id)
         if run_result["status"] != "completed":
-            return f"Fehler beim Erstellen des Überblicks: {run_result.get('error', 'Unbekannter Fehler')}"
+            raise Exception(f"Fehler beim Erstellen des Überblicks: {run_result.get('error', 'Unbekannter Fehler')}")
         
-        # Get the response
-        return self._get_assistant_response(thread.id) 
+        return self._get_assistant_response(thread.id)

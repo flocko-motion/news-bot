@@ -9,7 +9,6 @@ class NewsFetcherFactory:
         self.fetcher_class = BaseNewsFetcher
 
     def get_available_sources(self) -> List[str]:
-        """Get list of available source names from config files."""
         if not os.path.exists(self.config_dir):
             print(f"Config directory does not exist: {self.config_dir}")
             return []
@@ -22,9 +21,8 @@ class NewsFetcherFactory:
         return sorted(sources)
 
     def create_fetcher(self, source: str) -> BaseNewsFetcher:
-        """Create a fetcher for the given source."""
         config_path = os.path.join(self.config_dir, f"{source}.yaml")
         if not os.path.exists(config_path):
             raise FileNotFoundError(f"Config file not found: {config_path}")
             
-        return self.fetcher_class(config_path) 
+        return self.fetcher_class(source, config_path)
