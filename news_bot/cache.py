@@ -9,13 +9,18 @@ CACHE_DIR.mkdir(parents=True, exist_ok=True)
 
 def get_cache_path(key: str) -> Path:
     """Get the cache file path for a key."""
-    hashed_key = hash_string(key)
+    key_tokens = key.split(":")
+    hashed_key = key_tokens[0] + "_" + hash_string(key)
     return CACHE_DIR / hashed_key
 
 def has(key: str) -> bool:
     """Check if a cache entry exists."""
     cache_path = get_cache_path(key)
-    return cache_path.exists()
+    if cache_path.exists():
+        print(f"Cache hit: {cache_path}")
+        return True
+    print(f"Cache miss: {cache_path}")
+    return False
 
 def get(key: str) -> Optional[str]:
     """Get content from cache if it exists."""

@@ -27,6 +27,10 @@ class Article:
 	def cache_key_cleaned(self):
 		return "cleaned:" + self.source_url
 
+	def cache_key_title(self):
+		return "title:" + self.source_url
+
+
 	def is_cached(self) -> bool:
 		"""Check if the article is cached."""
 		return cache.has(self.cache_key_raw())
@@ -50,7 +54,8 @@ class Article:
 		return True
 
 	def cleaned(self) -> str:
-		if cache.has(self.cache_key_cleaned()):
+		if cache.has(self.cache_key_cleaned() and self.cache_key_title()):
+			self.title = cache.get(self.cache_key_title())
 			return cache.get(self.cache_key_cleaned())
 
 		soup = BeautifulSoup(self.raw, 'html.parser')
@@ -58,6 +63,7 @@ class Article:
 		title_tag = soup.find('title')
 		if title_tag:
 			self.title = title_tag.get_text().strip()
+			cache.put(self.cache_key_title(), self.title)
 
 		for element in soup(['header','script', 'style', 'img','picture', 'source', 'head', 'polygon', 'button', 'iframe', 'svg']):
 			element.decompose()
@@ -107,5 +113,9 @@ class Article:
 		if self.raw:
 			cache.put(self.cache_key_raw(), self.raw)
 			self.cached = True
+
+	def __str__(self) -> str:
+		return f"Article({self.source_name}, {self.source_url}, {self.date}, {self.title})"
+
 
 

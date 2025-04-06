@@ -5,12 +5,14 @@ from datetime import datetime
 import traceback
 
 from formatters.digest_formatter import generate_digest_index
+from formatters.html import generate_html
 from sources.article import Article
 from sources import NewsFetcherFactory
 from agents.news_assistant import NewsAssistant
 from agents.digest_assistant import DigestAssistant
 
-
+home = Path.home()
+digests_dir = home / '.news-bot' / 'digests'
 
 
 def main():
@@ -24,8 +26,6 @@ def main():
     # Initialize
     factory = NewsFetcherFactory()
     sources = factory.get_available_sources()
-    home = Path.home()
-    digests_dir = home / '.news-bot' / 'digests'
     digests_dir.mkdir(parents=True, exist_ok=True)
     news_assistant = NewsAssistant()
     digest_assistant = DigestAssistant()
@@ -49,17 +49,25 @@ def main():
         article.fetch()
         news_assistant.analyze_article(article)
 
-    # Step 3: Write digest
+    # Step 3: Generate digest
     digest = digest_assistant.create_digest(articles)
 
-    digest_path = digests_dir / f"digest-{datetime.now().strftime('%Y%m%d')}.html"
-    with open(digest_path, 'w') as f:
-        f.write(digest)
-    print(f"\nDigest saved to {digest_path}")
-    
-    # Generate index file
-    generate_digest_index(digests_dir)
+    # Step 4: Format and save result
+    write_html(f"digest-{datetime.now().strftime('%Y%m%d')}.html",generate_html(articles, digest))
+    write_html("index.html", generate_digest_index(digests_dir))
+    copy_file(Path(__file__).parent / 'formatters' / 'templates' / 'styles.css')
 
+def write_html(filename: str, content: str) -> None:
+    index_path = digests_dir / filename
+    with open(index_path, 'w', encoding='utf-8') as f:
+        f.write(content)
+
+def copy_file(src: Path) -> None:
+    dest = digests_dir / src.name
+    with open(src, 'rb') as fsrc, open(dest, 'wb') as fdst:
+        fdst.write(fsrc.read())
+    print(f"Copied {src} to {dest}")
 
 if __name__ == "__main__":
-    main() 
+    main()
+

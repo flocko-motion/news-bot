@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Brucker Pressespiegel</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Ausgaben</h1>
+    <ul class="digest-list">
+        {{#digests}}
+        <li class="digest-item">
+            <a href="{{filename}}">{{date}}</a>
+        </li>
+        {{/digests}}
+    </ul>
+</body>
+</html> 

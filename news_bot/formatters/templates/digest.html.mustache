@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Brucker Pressespiegel - {{date}}</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1 class="digest-title">Brucker Pressespiegel - {{date}}</h1>
+    
+    <div class="digest-content">
+        {{#articles}}
+        <div class="story">
+            <h2 class="story-title">{{title}}</h2>
+            <div class="story-content">{{text}}</div>
+            <div class="story-sources"><a class="story-source" href="{{source_url}}">{{source_name}}</a></div>
+        </div>
+        {{/articles}}
+    </div>
+</body>
+</html> 
