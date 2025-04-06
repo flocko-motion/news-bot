@@ -44,7 +44,6 @@ class DigestAssistant(Assistant):
 
         cache_key = "digest:" + datetime.datetime.now().strftime("%Y%m%d") + "_" + str(len(articles))
         if cache.has(cache_key):
-            print(f"Digest cache: {cache_key}")
             return cache.get(cache_key)
 
         articles_text = "\n\n".join([

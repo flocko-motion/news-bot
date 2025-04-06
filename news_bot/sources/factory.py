@@ -3,7 +3,7 @@ from typing import Dict, Type, List
 from .base import BaseNewsFetcher
 
 class NewsFetcherFactory:
-    def __init__(self, config_dir: str = "news_bot/config/sources"):
+    def __init__(self, config_dir: str = "config/sources"):
         self.config_dir = os.path.abspath(config_dir)
         print(f"Looking for configs in: {self.config_dir}")
         self.fetcher_class = BaseNewsFetcher

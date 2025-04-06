@@ -14,13 +14,20 @@ if [ ! -f "$API_KEY_FILE" ]; then
     exit 1
 fi
 
-# Default to GHCR image, fallback to local build
-REPO_OWNER=$(git config --get remote.origin.url | sed 's/.*github.com[:/]\([^/]*\)\/.*/\1/')
-IMAGE_NAME="ghcr.io/${REPO_OWNER}/news-bot:latest"
-if ! docker pull "$IMAGE_NAME" 2>/dev/null; then
-    echo "GHCR image not found, building locally..."
+# Determine which image to use
+if [ "$LOCAL" = "1" ]; then
+    echo "Building and using local image..."
     docker build -t news-bot .
     IMAGE_NAME="news-bot"
+else
+    # Default to GHCR image, fallback to local build
+    REPO_OWNER=$(git config --get remote.origin.url | sed 's/.*github.com[:/]\([^/]*\)\/.*/\1/')
+    IMAGE_NAME="ghcr.io/${REPO_OWNER}/news-bot:latest"
+    if ! docker pull "$IMAGE_NAME" 2>/dev/null; then
+        echo "GHCR image not found, building locally..."
+        docker build -t news-bot .
+        IMAGE_NAME="news-bot"
+    fi
 fi
 
 # Run the container with mounted volumes

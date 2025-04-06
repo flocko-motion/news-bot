@@ -39,5 +39,8 @@ WORKDIR /app
 # Create mount points for cache and digests
 RUN mkdir -p /app/.news-bot/cache /app/.news-bot/digests
 
+# Add project root to PYTHONPATH
+ENV PYTHONPATH=/app
+
 # Set the entrypoint
 ENTRYPOINT ["python", "-m", "news_bot.main"] 
