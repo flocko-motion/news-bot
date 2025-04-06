@@ -22,4 +22,5 @@ def generate_html(articles, digest):
     with open(template_path, 'r', encoding='utf-8') as f:
         template = f.read()
     
-    return chevron.render(template, context) 
+    html = chevron.render(template, context)
+    return html

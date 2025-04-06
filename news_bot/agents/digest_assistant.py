@@ -1,3 +1,4 @@
+import datetime
 from typing import Dict, Any, List
 
 import cache
@@ -41,7 +42,7 @@ class DigestAssistant(Assistant):
     def create_digest(self, articles: List[Article]) -> str:
         print (f"Creating digest for {len(articles)} articles (This might take a little while)")
 
-        cache_key = "digest:" + cache.hash_string(str([str(article) for article in articles]))
+        cache_key = "digest:" + datetime.datetime.now().strftime("%Y%m%d") + "_" + str(len(articles))
         if cache.has(cache_key):
             print(f"Digest cache: {cache_key}")
             return cache.get(cache_key)

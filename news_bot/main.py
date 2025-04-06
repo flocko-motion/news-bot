@@ -1,12 +1,8 @@
 import argparse
-from typing import List, Dict, Any
 from pathlib import Path
 from datetime import datetime
-import traceback
-
 from formatters.digest_formatter import generate_digest_index
 from formatters.html import generate_html
-from sources.article import Article
 from sources import NewsFetcherFactory
 from agents.news_assistant import NewsAssistant
 from agents.digest_assistant import DigestAssistant
@@ -21,8 +17,7 @@ def main():
     parser = argparse.ArgumentParser(description='Generate news digest from regional sources')
     parser.add_argument('--ignore-cached-news', action='store_true', 
                        help='Ignore previously cached articles when generating the digest')
-    args = parser.parse_args()
-    
+
     # Initialize
     factory = NewsFetcherFactory()
     sources = factory.get_available_sources()
@@ -30,7 +25,6 @@ def main():
     news_assistant = NewsAssistant()
     digest_assistant = DigestAssistant()
 
-    
     if not sources:
         print("No source configurations found!")
         return
@@ -42,7 +36,10 @@ def main():
         [article for source in sources for article in NewsFetcherFactory().create_fetcher(source).fetch_articles()],
         key=lambda a: a.source_url
     )
-        
+
+    articles = [article for article in articles if article.is_from_today()]
+    print(f"Identified {len(articles)} articles from today.")
+
     # Step 2: Fetch and clean content
     for i, article in enumerate(articles, 1):
         print(f"Processing {i} of {len(articles)}")

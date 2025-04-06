@@ -34,7 +34,7 @@ def generate_digest_index(digests_dir: Path) -> str:
 		'digests': [
 			{
 				'filename': f.name,
-				'date': f.stem[7:17]
+				'date': f.stem[7:17][0:4] + '-' + f.stem[7:17][4:6] + '-' + f.stem[7:17][6:8],
 			}
 			for f in digest_files
 		]

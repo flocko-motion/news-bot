@@ -18,9 +18,11 @@ class NewsAssistant(Assistant):
     def analyze_article(self, article: Article):
         cache_key = "analyzed:" + article.source_url
 
-        if cache.has(cache_key):
+        if cache.has(cache_key) and cache.has(article.cache_key_title()):
             print(f"Summary cache: {article.source_url}")
             article.summary = cache.get(cache_key)
+            article.date = cache.created(article.cache_key_raw())
+            article.title = cache.get(article.cache_key_title())
             return
 
         print(f"Summary generation: {article.source_url}")

@@ -54,8 +54,7 @@ class Article:
 		return True
 
 	def cleaned(self) -> str:
-		if cache.has(self.cache_key_cleaned() and self.cache_key_title()):
-			self.title = cache.get(self.cache_key_title())
+		if cache.has(self.cache_key_cleaned()):
 			return cache.get(self.cache_key_cleaned())
 
 		soup = BeautifulSoup(self.raw, 'html.parser')
@@ -116,6 +115,12 @@ class Article:
 
 	def __str__(self) -> str:
 		return f"Article({self.source_name}, {self.source_url}, {self.date}, {self.title})"
+
+	def is_from_today(self):
+		age = cache.age(self.cache_key_raw())
+		if age > 0:
+			return False
+		return True
 
 
 

@@ -1,3 +1,4 @@
+import datetime
 import hashlib
 from datetime import date
 from pathlib import Path
@@ -41,6 +42,19 @@ def put(key: str, content: str) -> None:
             f.write(content)
     except Exception as e:
         print(f"Error writing cache for {key}: {e}")
+
+def created(key: str) -> Optional[datetime.datetime]:
+    """Get the date of a cached item.
+
+    Returns:
+        Date when the cache was created, or None if not found
+    """
+    cache_path = get_cache_path(key)
+    if cache_path.exists():
+        mtime = cache_path.stat().st_mtime
+        file_date = datetime.datetime.fromtimestamp(mtime)
+        return file_date
+    return None
 
 def age(key: str) -> Optional[int]:
     """Get the age of a cached item in calendar days.
