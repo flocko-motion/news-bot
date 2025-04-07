@@ -34,7 +34,7 @@ COPY news_bot /app/news_bot
 COPY news-bot /app/news-bot
 
 # Set working directory
-WORKDIR /app
+WORKDIR /app/news_bot
 
 # Create mount points for cache and digests
 RUN mkdir -p /app/.news-bot/cache /app/.news-bot/digests
